@@ -24,6 +24,12 @@
 4. **Run**: Click **Start**. The app will automatically rotate the ESP32 turntable, play the signal, record the response, run the DSP analysis, and update the polar plot step-by-step.
 5. **Results**: All generated WAV files, images, and the final Excel report are saved in a dedicated session folder.
 
+## 👨‍💻 Author
+Developed as part of a Master's thesis: Automated Polar Pattern Measurement with a Turntable (ESP32 + stepper motor).
+
+## 📄 License
+This software is provided "as is", without warranty of any kind.
+
 ---
 ---
 
@@ -130,3 +136,37 @@ Measurement_1_143020/
 │       ├── Spectrogram_0deg.png
 │       └── ...
 └── MeasurementResults.xlsx     # frekvenční odezva, impulsní odezva, časová doména
+```
+### Architektura projektu
+```Plaintext
+MeaSound/
+├── Analysis/
+│   ├── SignalAnalyzer.cs       # DSP jádro: FFT, dekonvoluce, IR, THD, SNR …
+│   ├── SignalGenerator.cs      # generování testovacích signálů
+│   └── Spectrogram.cs          # STFT vizualizace
+├── Audio/
+│   ├── AudioRecorder.cs        # WASAPI nahrávání
+│   ├── AsioRecorder.cs         # ASIO nahrávání
+│   ├── AsioPlayback.cs         # ASIO přehrávání
+│   ├── MeasurementPlayback.cs  # WASAPI přehrávání pro měření
+│   └── AudioDeviceManager.cs   # výčet a správa audio zařízení
+├── Measurement/
+│   ├── MeasurementManager.cs   # orchestrace celého měřicího procesu
+│   └── ExcelDataSaver.cs       # export do .xlsx
+├── Serial/
+│   └── SerialPortManager.cs    # komunikace s ESP32
+├── UI/
+│   ├── MainWindow/             # partial třídy hlavního okna
+│   ├── ChartManager.cs         # správa ScottPlot grafů
+│   └── ThemeManager.cs         # správa světlého/tmavého motivu
+├── Config/
+│   └── Preferences.cs          # trvalá nastavení (JSON)
+├── Enums/
+│   └── SignalEnums.cs          # výčty: TestSignalType, SweepType, AnalysisMethod …
+└── Helpers/                    # pomocné třídy (ArraySampleProvider, MlsBuilder …)
+```
+### Autor
+Vyvinuto v rámci diplomové práce: Automatizované měření polárních grafů s otočným zařízením (ESP32 + krokový motor).
+
+### Licence
+Tento software je poskytován „tak, jak je" bez jakýchkoli záruk. 
