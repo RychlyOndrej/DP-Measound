@@ -63,17 +63,17 @@ MeaSound je WPF aplikace pro automatizované měření polárních grafů mikrof
 | Multi-tón / Konstantní tón | Vybrané frekvence najednou / jedna | DirectFFT |
 | Vlastní soubor | Libovolný WAV soubor | DirectFFT / Wiener |
 
-- Nastavte **frekvenční rozsah** (výchozí 100 Hz – 8 kHz) a **délku sweepů** (výchozí 10 s).
+- Nastavte **frekvenční rozsah** (např. 800 Hz – 8 kHz) a **délku sweepů** (např. 10 s).
 - Zvolte **vzorkovací frekvenci** a **bitovou hloubku** podle možností zvukové karty.
 
 ### 3. Nastavení otočného stolku
 - **Počet kroků na otáčku** – počet měřicích poloh za jednu otočku (360°).
-- **Počet opakování** – kolikrát se celá otočka zopakuje a výsledky zprůměrují.
-- **Úhel mikrofonu** – výchozí poloha mikrofonu vůči ose reproduktoru.
-- **Vzdálenost mikrofonu** – vzdálenost mikrofonu od zdroje zvuku (zaznamenává se do Excelu).
+- **Počet opakování** – kolikrát se celá otočka zopakuje a výsledky si vytvoří novou složku.
+- **Úhel mikrofonu** – vertikální poloha mikrofonu vůči ose reproduktoru.
+- **Vzdálenost mikrofonu** – vzdálenost mikrofonu od zdroje zvuku.
 
 ### 4. Volba analyzovaných frekvencí
-- Zadejte seznam frekvencí, které se zobrazí jako body v polárním diagramu a v tabulce výsledků.
+- Vyberte frekvence, které se zobrazí jako body v polárním diagramu a v tabulce výsledků.
 
 ### 5. Spuštění měření
 1. Klikněte na **Spustit měření**.
@@ -102,12 +102,6 @@ Measurement_1_143020/
 │       └── ...
 └── MeasurementResults.xlsx     # frekvenční odezva, impulsní odezva, časová doména
 ```
-
-### 7. Kalibrace výstupu
-- Otevřete **Kalibrace výstupu** (ikona v hlavním panelu).
-- Nastavte kalibrační zisk v dB; hodnota se uloží do `%AppData%\MeaSound\preferences.json` a aplikuje se na veškeré přehrávání.
-
----
 
 ## Architektura projektu
 
@@ -142,7 +136,7 @@ MeaSound/
 ---
 
 ## Autor
-Vyvinuto v rámci projektu automatizovaného měření polárních grafů s otočným zařízením (ESP+krokmotor).
+Vyvinuto v rámci DP automatizovaného měření polárních grafů s otočným zařízením (ESP+krokový motor).
 
 ## Licence
 Tento software je poskytován „tak jak je" bez jakýchkoli záruk.
