@@ -1,18 +1,47 @@
-# MeaSound – Měření polárních grafů
+# MeaSound – Polar Pattern Measurement
+
+**MeaSound** is a WPF application designed for automated polar pattern measurements of microphones and other audio devices using an ESP32-controlled turntable. The software handles signal generation, audio recording, digital signal processing (DSP), and automatic exporting of results and graphs.
+
+## 🌟 Key Features
+- **Test Signals**: Sine Sweep (Linear / Exponential / Power-law), MLS, White/Pink noise, Multi-tone, Stepped sine, and Custom WAV files.
+- **DSP Analysis**: Farina deconvolution (ESS), Wiener deconvolution (regularized spectral inversion), and Direct FFT.
+- **Data Visualization**: Real-time Polar plots (ScottPlot), FFT spectrums, and STFT Spectrograms.
+- **Audio Backend**: WASAPI & ASIO support, including a hardware loopback reference channel for latency compensation.
+- **Export**: Automatically saves numerical data to Excel (.xlsx), charts to PNG/SVG, and all recordings to WAV.
+- **UI**: Modern Dark/Light theme (MahApps.Metro + MaterialDesign).
+
+## ⚙️ Requirements
+* **OS**: Windows 10 / 11 (64-bit)
+* **Framework**: .NET 9 (net9.0-windows)
+* **Hardware**: 
+  * ESP32 running serial communication firmware (turntable controller).
+  * WASAPI or ASIO-compatible audio interface.
+
+## 🚀 Quick Start
+1. **Audio Setup**: Select your input/output devices and preferred backend. Enable the loopback reference channel if available.
+2. **Signal & Analysis**: Choose a test signal (e.g., Exponential Sine Sweep) and the target frequency range.
+3. **Turntable Setup**: Set the number of measurement steps per 360° rotation.
+4. **Run**: Click **Start**. The app will automatically rotate the ESP32 turntable, play the signal, record the response, run the DSP analysis, and update the polar plot step-by-step.
+5. **Results**: All generated WAV files, images, and the final Excel report are saved in a dedicated session folder.
+
+---
+---
+
+# MeaSound – Měření polárních grafů (CZ)
 
 ## Popis aplikace
-MeaSound je WPF aplikace pro automatizované měření polárních grafů mikroffonu a dalších audio zařízení zařízení řízeného ESP32. Aplikace generuje testovací signály, nahrává odezvu mikrofonu, analyzuje frekvenční charakteristiku a ukládá výsledky i wavky do souborů.
+MeaSound je WPF aplikace pro automatizované měření polárních grafů mikrofonů a dalších audio zařízení řízeného přes ESP32. Aplikace generuje testovací signály, nahrává odezvu mikrofonu, analyzuje frekvenční charakteristiku a ukládá výsledky i WAV soubory.
 
 ### Hlavní funkce
-- **Generování testovacích signálů** – Sine Sweep (lineární / exponenciální / power-law), MLS, bílý šum, růžový šum, konstantní tón, multi-tón, stepped sine a vlastní soubor
-- **Analýza frekvenční odezvy** – Farina dekonvoluce (ESS), Wiener dekonvoluce (regularizovaná spektrální inverze), přímé FFT
-- **Polární diagramy** – automatické vykreslení polárního diagramu po každém kroku měření (ScottPlot)
-- **FFT spektrum** – zobrazení průběhu přenosové funkce i přesných bodů pro zvolené frekvence
-- **Spektrogram** – STFT vizualizace nahrávky (8192-bodové okno)
-- **Smyčkový (loopback) referenční kanál** – podpora druhého kanálu zvukové karty jako reference (WASAPI i ASIO)
-- **Kompenzace mikrofonu** – nastavitelný kalibrační zisk v dB
-- **Ukládání výsledků** – Excel (.xlsx přes ClosedXML), PNG/SVG grafy, WAV nahrávky
-- **Světlý / tmavý motiv** – MahApps.Metro + MaterialDesign, volitelné bílé pozadí pro export grafů
+- **Generování testovacích signálů** – Sine Sweep (lineární / exponenciální / power-law), MLS, bílý šum, růžový šum, konstantní tón, multi-tón, stepped sine a vlastní soubor.
+- **Analýza frekvenční odezvy** – Farina dekonvoluce (ESS), Wiener dekonvoluce (regularizovaná spektrální inverze), přímé FFT.
+- **Polární diagramy** – Automatické vykreslení polárního diagramu po každém kroku měření (ScottPlot).
+- **FFT spektrum** – Zobrazení průběhu přenosové funkce i přesných bodů pro zvolené frekvence.
+- **Spektrogram** – STFT vizualizace nahrávky (8192-bodové okno).
+- **Smyčkový (loopback) referenční kanál** – Podpora druhého kanálu zvukové karty jako reference (WASAPI i ASIO).
+- **Kompenzace mikrofonu** – Nastavitelný kalibrační zisk v dB.
+- **Ukládání výsledků** – Excel (.xlsx přes ClosedXML), PNG/SVG grafy, WAV nahrávky.
+- **Světlý / tmavý motiv** – MahApps.Metro + MaterialDesign, volitelné bílé pozadí pro export grafů.
 
 ---
 
@@ -21,7 +50,7 @@ MeaSound je WPF aplikace pro automatizované měření polárních grafů mikrof
 |---|---|
 | OS | Windows 10 / 11 (64-bit) |
 | .NET | .NET 9 (net9.0-windows) |
-| ESP32 | firmware s podporou sériové komunikace (příkaz otočení, odpověď `rotated`) |
+| ESP32 | Firmware s podporou sériové komunikace (příkaz otočení, odpověď `rotated`) |
 | Zvuková karta | WASAPI nebo ASIO-kompatibilní zařízení |
 
 ---
@@ -47,10 +76,10 @@ MeaSound je WPF aplikace pro automatizované měření polárních grafů mikrof
 ## Použití aplikace
 
 ### 1. Nastavení audio zařízení
-- **Výstupní zařízení** – vyberte reproduktor / zesilovač, přes který se přehraje testovací signál.
-- **Vstupní zařízení** – vyberte mikrofon / zvukovou kartu pro nahrávání.
-- **Backend** – zvolte WASAPI (výchozí) nebo ASIO pro nízkolatenční měření.
-- **Referenční kanál** – pokud zvuková karta nabízí loopback kanál, povolte *Použít referenční kanál* pro přesnější dekonvoluci bez nutnosti zarovnávání signálů.
+- **Výstupní zařízení** – Vyberte reproduktor / zesilovač, přes který se přehraje testovací signál.
+- **Vstupní zařízení** – Vyberte mikrofon / zvukovou kartu pro nahrávání.
+- **Backend** – Zvolte WASAPI (výchozí) nebo ASIO pro nízkolatenční měření.
+- **Referenční kanál** – Pokud zvuková karta nabízí loopback kanál, povolte *Použít referenční kanál* pro přesnější dekonvoluci bez nutnosti zarovnávání signálů v čase.
 
 ### 2. Výběr testovacího signálu
 | Typ | Popis | Doporučená analýza |
@@ -67,10 +96,10 @@ MeaSound je WPF aplikace pro automatizované měření polárních grafů mikrof
 - Zvolte **vzorkovací frekvenci** a **bitovou hloubku** podle možností zvukové karty.
 
 ### 3. Nastavení otočného stolku
-- **Počet kroků na otáčku** – počet měřicích poloh za jednu otočku (360°).
-- **Počet opakování** – kolikrát se celá otočka zopakuje a výsledky si vytvoří novou složku.
-- **Úhel mikrofonu** – vertikální poloha mikrofonu vůči ose reproduktoru.
-- **Vzdálenost mikrofonu** – vzdálenost mikrofonu od zdroje zvuku.
+- **Počet kroků na otáčku** – Počet měřicích poloh za jednu otočku (360°).
+- **Počet opakování** – Kolikrát se celá otočka zopakuje (výsledky si vytvoří novou složku).
+- **Úhel mikrofonu** – Vertikální poloha mikrofonu vůči ose reproduktoru.
+- **Vzdálenost mikrofonu** – Vzdálenost mikrofonu od zdroje zvuku.
 
 ### 4. Volba analyzovaných frekvencí
 - Vyberte frekvence, které se zobrazí jako body v polárním diagramu a v tabulce výsledků.
@@ -84,7 +113,7 @@ MeaSound je WPF aplikace pro automatizované měření polárních grafů mikrof
 ### 6. Výsledky
 Po dokončení měření je v session složce (`%BasePath%\MeaSound_YYYYMMDD_HHmmss\Measurement_N_HHMMSS`) k dispozici:
 
-```
+```text
 Measurement_1_143020/
 ├── Audio/
 │   ├── TestSignal.wav          # vygenerovaný testovací signál
@@ -101,43 +130,3 @@ Measurement_1_143020/
 │       ├── Spectrogram_0deg.png
 │       └── ...
 └── MeasurementResults.xlsx     # frekvenční odezva, impulsní odezva, časová doména
-```
-
-## Architektura projektu
-
-```
-MeaSound/
-├── Analysis/
-│   ├── SignalAnalyzer.cs       # DSP jádro: FFT, dekonvoluce, IR, THD, SNR …
-│   ├── SignalGenerator.cs      # generování testovacích signálů
-│   └── Spectrogram.cs          # STFT vizualizace
-├── Audio/
-│   ├── AudioRecorder.cs        # WASAPI nahrávání
-│   ├── AsioRecorder.cs         # ASIO nahrávání
-│   ├── AsioPlayback.cs         # ASIO přehrávání
-│   ├── MeasurementPlayback.cs  # WASAPI přehrávání pro měření
-│   └── AudioDeviceManager.cs   # výčet a správa audio zařízení
-├── Measurement/
-│   ├── MeasurementManager.cs   # orchestrace celého měřicího procesu
-│   └── ExcelDataSaver.cs       # export do .xlsx
-├── Serial/
-│   └── SerialPortManager.cs    # komunikace s ESP32
-├── UI/
-│   ├── MainWindow/             # partial třídy hlavního okna
-│   ├── ChartManager.cs         # správa ScottPlot grafů
-│   └── ThemeManager.cs         # správa světlého/tmavého motivu
-├── Config/
-│   └── Preferences.cs          # trvalá nastavení (JSON)
-├── Enums/
-│   └── SignalEnums.cs           # výčty: TestSignalType, SweepType, AnalysisMethod …
-└── Helpers/                    # pomocné třídy (ArraySampleProvider, MlsBuilder …)
-```
-
----
-
-## Autor
-Vyvinuto v rámci DP automatizovaného měření polárních grafů s otočným zařízením (ESP+krokový motor).
-
-## Licence
-Tento software je poskytován „tak jak je" bez jakýchkoli záruk.
-
