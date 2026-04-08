@@ -1,0 +1,585 @@
+<Window x:Class="MeaSound.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:scottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        mc:Ignorable="d"
+        Title="MeaSound" Height="1400" Width="1200"
+        Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+        FontFamily="Segoe UI Variable, Segoe UI"
+        BorderThickness="1"
+        >
+
+
+    <Window.Resources>
+        <!-- Keep only app-specific styles that are not part of themes -->
+        <Style x:Key="IndicatorStyle" TargetType="Border">
+            <Setter Property="Width" Value="15"/>
+            <Setter Property="Height" Value="15"/>
+            <Setter Property="CornerRadius" Value="7.5"/>
+            <Setter Property="Background" Value="Red"/>
+            <Setter Property="Margin" Value="5,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <SolidColorBrush x:Key="IndicatorRedBrush" Color="Red"/>
+        <SolidColorBrush x:Key="IndicatorGreenBrush" Color="LimeGreen"/>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="LeftCol0" Width="106.854" />
+            <ColumnDefinition x:Name="LeftCol1" Width="313.146"/>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer x:Name="LeftPanelScrollViewer" Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="10,10,10,10" Padding="5" Grid.ColumnSpan="2">
+            <StackPanel>
+                <TextBlock Text="Nastaveni"
+                           FontWeight="SemiBold"
+                           FontSize="18"
+                           Margin="0,0,0,15"
+                           Foreground="{DynamicResource TextForeground}"/>
+
+                <GroupBox Header="Ovladač připojení kontroleru" Margin="0,0,0,10" Padding="5">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Výběr ovladače:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <ComboBox Grid.Column="1" x:Name="ComboBoxController" SelectionChanged="ComboBoxController_SelectionChanged"/>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,10">
+                            <TextBlock Text="Baudrate:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <ComboBox x:Name="BaudrateComboBox"
+                                      Width="100">
+                                <ComboBoxItem Content="9600"/>
+                                <ComboBoxItem Content="19200"/>
+                                <ComboBoxItem Content="38400"/>
+                                <ComboBoxItem Content="57600"/>
+                                <ComboBoxItem Content="115200"/>
+                                <ComboBoxItem Content="230400"/>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                            <Button x:Name="BtnConnectController" Content="Připojit" Click="BtnConnectController_Click" Padding="15,2" Margin="5,0"/>
+                            <Button x:Name="BtnDisconnectController" Content="Odpojit" Click="BtnDisconnectController_Click" Padding="15,2" Margin="5,0"/>
+                            <Button x:Name="BtnRefreshControllers" Content="Obnovit" Click="BtnRefreshControllers_Click" Padding="15,2" Margin="5,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Výběr audio zařízení" Margin="0,0,0,10" Padding="5">
+                    <StackPanel>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Vzorkovací frekvence:" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxSampleRate" MinWidth="160" SelectedIndex="5" HorizontalAlignment="Left" Margin="0,0,0,5">
+                                <ComboBoxItem Tag="8000">8 kHz</ComboBoxItem>
+                                <ComboBoxItem Tag="11025">11.025 kHz</ComboBoxItem>
+                                <ComboBoxItem Tag="22050">22.05 kHz</ComboBoxItem>
+                                <ComboBoxItem Tag="32000">32 kHz</ComboBoxItem>
+                                <ComboBoxItem Tag="44100">44.1 kHz</ComboBoxItem>
+                                <ComboBoxItem Tag="48000">48 kHz</ComboBoxItem>
+                                <ComboBoxItem Tag="96000">96 kHz</ComboBoxItem>
+                                <ComboBoxItem Tag="192000">192 kHz</ComboBoxItem>
+                            </ComboBox>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Vstupní backend:" VerticalAlignment="Center"/>
+                            <WrapPanel Grid.Row="1" Grid.Column="1">
+                              <ComboBox x:Name="ComboBoxInputBackend" Width="120" SelectedIndex="0" SelectionChanged="ComboBoxInputBackend_SelectionChanged">
+                                <ComboBoxItem Tag="wasapi" Content="WASAPI"/>
+                                <ComboBoxItem Tag="asio" Content="ASIO"/>
+                              </ComboBox>
+
+                              <StackPanel x:Name="AsioDriverPanel" Orientation="Horizontal" Margin="10,0,0,0" Visibility="Collapsed">
+                                <TextBlock Text="Driver:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <ComboBox x:Name="ComboBoxAsioDriver" Width="160" />
+                              </StackPanel>
+                            </WrapPanel>
+                        </Grid>
+
+                        <Separator Margin="0,0,0,8"/>
+
+                        <TextBlock x:Name="TxtInputSectionHeader" Text="Vstup" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+                        <Grid x:Name="WasapiInputSettingsGrid" Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" MinWidth="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Zařízení:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                            <ComboBox x:Name="ComboBoxSoundCard" Grid.Row="0" Grid.Column="1" Margin="0,0,0,10" SelectionChanged="ComboBoxSoundCard_SelectionChanged" DisplayMemberPath="FriendlyName" />
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Bity:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                            <ComboBox x:Name="ComboBoxInputBitDepth" Grid.Row="1" Grid.Column="1" Width="140" HorizontalAlignment="Left" Margin="0,0,0,10" SelectedIndex="0">
+                                <ComboBoxItem Tag="16">16-bit PCM</ComboBoxItem>
+                                <ComboBoxItem Tag="24">24-bit PCM</ComboBoxItem>
+                                <ComboBoxItem Tag="32">32-bit PCM</ComboBoxItem>
+                                <ComboBoxItem Tag="32f">32-bit Float</ComboBoxItem>
+                            </ComboBox>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Akce:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <WrapPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">
+                                <Button Name="BtnConnectAudio" Content="Připojit" Click="BtnConnectInputAudio_Click" Padding="8,2" Margin="0,0,6,0"/>
+                                <Button Name="BtnDisconnectAudio" Content="Odpojit" Click="BtnDisconnectInputAudio_Click" Padding="8,2" Margin="0,0,6,0"/>
+                                <Button Name="BtnRefreshAudio" Content="Obnovit" Click="BtnRefreshInputAudio_Click" Padding="8,2" Margin="0,0,6,0"/>
+                                <Button x:Name="BtnProbeExclusiveInput" Content="Test Exclusive" Click="BtnProbeExclusiveInput_Click" Padding="8,2" Margin="0,0,0,0"/>
+                            </WrapPanel>
+                        </Grid>
+
+                        <!-- Konfigurace signálového a referenčního kanálu -->
+                        <GroupBox Header="Konfigurace kanálu" Margin="0,10,0,0" Padding="5">
+                            <StackPanel>
+                                <!-- Measurement Channel (povinny) -->
+                                <Grid Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Měřící kanál:" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="ComboBoxInputSignalChannel" Grid.Column="1" Width="130" HorizontalAlignment="Left" SelectedIndex="0" SelectionChanged="ComboBoxInputSignalChannel_Changed"/>
+                                </Grid>
+
+                                <!-- Referenční kanál (volitelný, None = vypnut) -->
+                                <Grid Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Referenční kanál:" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="ComboBoxInputReferenceChannel" Grid.Column="1" Width="130" HorizontalAlignment="Left" SelectedIndex="0" SelectionChanged="ComboBoxInputReferenceChannel_Changed"/>
+                                </Grid>
+
+                                <!-- Nápověda -->
+                                <TextBlock Text="Tip: Pro loopback korekci propojte Output kabelem do Reference vstupu."
+                                           Margin="0,5,0,0"
+                                           TextWrapping="Wrap"
+                                           FontSize="11"
+                                           Foreground="Gray"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <Separator Margin="0,6,0,8"/>
+
+                        <TextBlock Text="Výstup" FontWeight="SemiBold" Margin="0,0,0,6"/>
+
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" MinWidth="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Zařízení:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                            <ComboBox x:Name="ComboBoxSpeaker" Grid.Row="0" Grid.Column="1" MinWidth="160" Margin="0,0,0,10" SelectionChanged="ComboBoxSpeaker_SelectionChanged" DisplayMemberPath="FriendlyName"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Bity:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                            <ComboBox x:Name="ComboBoxOutputBitDepth" Grid.Row="1" Grid.Column="1" Width="140" HorizontalAlignment="Left" Margin="0,0,0,10" SelectedIndex="0">
+                                <ComboBoxItem Tag="16">16-bit PCM</ComboBoxItem>
+                                <ComboBoxItem Tag="24">24-bit PCM</ComboBoxItem>
+                                <ComboBoxItem Tag="32">32-bit PCM</ComboBoxItem>
+                                <ComboBoxItem Tag="32f">32-bit Float</ComboBoxItem>
+                            </ComboBox>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Akce:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <WrapPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">
+                                <Button x:Name="BtnConnectOutputDevice" Content="Připojit" Click="BtnConnectOutputDevice_Click" Padding="8,2" Margin="0,0,6,0"/>
+                                <Button x:Name="BtnDisconnectOutputDevice" Content="Odpojit" Click="BtnDisconnectOutputDevice_Click" Padding="8,2" Margin="0,0,6,0"/>
+                                <Button x:Name="BtnRefreshOutputDevices" Content="Obnovit" Click="BtnRefreshOutputDevices_Click" Padding="8,2" Margin="0,0,0,0"/>
+                            </WrapPanel>
+                        </Grid>
+
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Testování mikrofonu" Margin="0,0,0,10" Padding="5">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5">
+                            <Button x:Name="BtnRecordAudio" Content="Nahrát" Click="BtnRecordAudio_Click" Padding="15,2" Margin="5,0"/>
+                            <Button x:Name="BtnPlayAudio" Content="Přehrát" Click="BtnPlayAudio_Click" IsEnabled="False" Padding="15,2" Margin="5,0"/>
+                        </StackPanel>
+                        <Button x:Name="BtnOpenLevelCalibration" Content="Kalibrace úrovní mikrofonu"
+                                HorizontalAlignment="Center"
+                                Padding="15,4" Margin="0,2,0,0"
+                                Click="BtnOpenLevelCalibration_Click"
+                                ToolTip="Otevře okno pro vyrovnání úrovně výstupu a vstupu mikrofonu pomocí 1 kHz sinusoidy"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Přehrávání testového signálu" Margin="0,0,0,10" Padding="5">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Typ signálu:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <ComboBox Grid.Column="1" x:Name="ComboBoxSignalType"
+                                      SelectionChanged="ComboBoxSignalType_SelectionChanged">
+                                <ComboBoxItem Content="SineSweep"/>
+                                <ComboBoxItem Content="MLS"/>
+                                <ComboBoxItem Content="WhiteNoise"/>
+                                <ComboBoxItem Content="PinkNoise"/>
+                                <ComboBoxItem Content="ConstantTone"/>
+                                <ComboBoxItem Content="MultiTone"/>
+                                <ComboBoxItem Content="SteppedSine"/>
+                                <ComboBoxItem Content="CustomFile"/>
+                            </ComboBox>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5" x:Name="WaveformPanel" Visibility="Collapsed">
+                            <TextBlock Text="Waveform:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <ComboBox x:Name="ComboBoxWaveform" Width="100">
+                                <ComboBoxItem Content="Sine"/>
+                                <ComboBoxItem Content="Square"/>
+                                <ComboBoxItem Content="Triangle"/>
+                                <ComboBoxItem Content="Sawtooth"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel x:Name="SweepPanel" Orientation="Vertical" Visibility="Collapsed" Margin="0,5,0,0">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Start [Hz]:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBox x:Name="TextBoxSweepStart" Width="80"/>
+                                <TextBlock Text="Konec [Hz]:" VerticalAlignment="Center" Margin="10,0,10,0"/>
+                                <TextBox x:Name="TextBoxSweepEnd" Width="80"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <TextBlock Text="Typ sweepu:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <ComboBox x:Name="ComboBoxSweepType" Width="180">
+                                    <ComboBoxItem Tag="Linear"           Content="Linear"/>
+                                    <ComboBoxItem Tag="ExponentialSweep" Content="Exponential Sweep (ESS)" IsSelected="True"/>
+                                    <ComboBoxItem Tag="PowerLaw"         Content="Power-law"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0" x:Name="MLSPanel" Visibility="Collapsed">
+                            <TextBlock Text="MLS Order:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBox x:Name="TextBoxMLSOrder" Width="50"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0" x:Name="ConstantTone" Visibility="Collapsed">
+                            <TextBlock Text="Frekvence [Hz]" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBox x:Name="TextBoxConstFreq" Width="50"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0" x:Name="MultiTonePanel" Visibility="Collapsed">
+                            <TextBlock Text="Frekvence [Hz, CSV]:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBox x:Name="TextBoxMultiToneFrequencies" Width="200"
+                                     Text="400,800"
+                                     GotFocus="TextBoxMultiToneFrequencies_GotFocus"
+                                     LostFocus="TextBoxMultiToneFrequencies_LostFocus"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0" x:Name="SteppedSinePanel" Visibility="Collapsed">
+                            <TextBlock Text="Frekvence [Hz, CSV]:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBox x:Name="TextBoxSteppedSineFrequencies" Width="200"
+                                     Text="100,200,500,1000,2000,5000,10000"
+                                     GotFocus="TextBoxSteppedSineFrequencies_GotFocus"
+                                     LostFocus="TextBoxSteppedSineFrequencies_LostFocus"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0" x:Name="WhiteNoisePanel" Visibility="Collapsed">
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0" x:Name="PinkNoisePanel" Visibility="Collapsed">
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0" x:Name="CustomSoundFilePanel" Visibility="Collapsed" VerticalAlignment="Center">
+                            <TextBlock Text="Soubor:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBox x:Name="TextBoxCustomSoundFilePath" Width="200" IsReadOnly="True" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                            <Button x:Name="BtnSelectCustomSoundFile" Content="..." Width="30" VerticalAlignment="Center" Click="BtnSelectCustomSoundFile_Click"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0" x:Name="DurationPanel" Visibility="Collapsed">
+                            <TextBlock Text="Délka [s]:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBox x:Name="TextBoxDuration" Width="50"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+                            <Button x:Name="BtnPlaySelectedSignal" Content="Přehrát testovací signál" Width="150" Margin="0,0,10,0" Click="BtnPlaySelectedSignal_Click"/>
+                            <Button x:Name="BtnStopPlayback" Content="Stop" Width="150" Margin="0,0,10,0" Click="BtnStopPlayback_Click" IsEnabled="False"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Práce s motorem" Margin="0,0,0,10" Padding="5">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,5" HorizontalAlignment="Center">
+                            <TextBlock Text="Stav motoru:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <ToggleButton x:Name="ToggleMotorLock"
+                                          Content="Zamknuto"
+                                          Width="80"
+                                          Margin="0,0,10,0"
+                                          Checked="ToggleMotorLock_Checked"
+                                          Unchecked="ToggleMotorLock_Unchecked"/>
+
+                            <TextBox x:Name="RotateAngleBox"
+                                     Width="80"
+                                     Text="0"
+                                     VerticalContentAlignment="Center"
+                                     Margin="20,0,5,0"/>
+                            <Button x:Name="RotateByText"
+                                    Content="Otoč"
+                                    Width="40"
+                                    Click="RotateByText_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+				<GroupBox Header="Parametry měření" Margin="0,0,0,10" Padding="5">
+					<Grid>
+						<Grid.Resources>
+							<Style TargetType="TextBlock">
+								<Setter Property="VerticalAlignment" Value="Center"/>
+								<Setter Property="Margin" Value="0,5"/>
+							</Style>
+
+							<Style TargetType="TextBox">
+								<Setter Property="VerticalAlignment" Value="Center"/>
+								<Setter Property="HorizontalAlignment" Value="Left"/>
+								<Setter Property="Margin" Value="0,2"/>
+							</Style>
+						</Grid.Resources>
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="140"/>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+						</Grid.RowDefinitions>
+
+						<TextBlock Grid.Row="0" Grid.Column="0" Text="Počet měření / 360:"/>
+						<TextBox Grid.Row="0" Grid.Column="1" x:Name="TxtStepsPerRev" Text="4" Width="60" TextChanged="TxtStepsPerRev_Changed" Padding="3"/>
+						<TextBlock Grid.Row="0" Grid.Column="2" x:Name="TxtAngleStep" Text="= 90°/krok" VerticalAlignment="Center" Margin="8,5,0,5" Foreground="Gray"/>
+
+						<TextBlock Grid.Row="1" Grid.Column="0" Text="Počet opakování:"/>
+						<TextBox Grid.Row="1" Grid.Column="1" x:Name="TxtNumRepeats" Text="1" Width="60" TextChanged="TxtNumRepeats_Changed" Padding="3"/>
+
+						<TextBlock Grid.Row="2" Grid.Column="0" Text="Úhel mikrofonu ():"/>
+						<TextBox Grid.Row="2" Grid.Column="1" x:Name="TxtMicAngle" Text="0" Width="60" Padding="3"/>
+
+						<TextBlock Grid.Row="3" Grid.Column="0" Text="Vzdálenost mikrofonu (m):"/>
+						<TextBox Grid.Row="3" Grid.Column="1" x:Name="TxtMicDistance" Text="1.0" Width="60" Padding="3"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Dekonvoluce:"/>
+                        <ComboBox Grid.Row="4" Grid.Column="1" x:Name="ComboBoxDeconvolutionMethod" Width="140" SelectionChanged="ComboBoxDeconvolutionMethod_SelectionChanged">
+                            <ComboBoxItem Tag="DirectFft" Content="FFT" IsSelected="True"/>
+                            <ComboBoxItem Tag="Wiener" Content="Wiener"/>
+                            <ComboBoxItem Tag="Farina" Content="Farina"/>
+                        </ComboBox>
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" x:Name="TxtWienerLambdaLabel" Text="Wiener ? (exp):"/>
+                        <TextBox Grid.Row="5" Grid.Column="1" x:Name="TxtWienerLambda" Text="-5" Width="60" Padding="3" ToolTip="Zadejte exponent nebo hodnotu (např. -7 nebo 1E-7)."/>
+
+					</Grid>
+				</GroupBox>
+
+                <GroupBox Header="Stav systému" Margin="0,0,0,10" Padding="5">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Průběh měření:" VerticalAlignment="Center"/>
+                            <ProgressBar Grid.Column="1" x:Name="ProgressMeasurement" Value="0" Maximum="100"/>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="Číslo měření:" Width="150"/>
+                            <TextBlock x:Name="TxtMeasurementIndex" Text="0 / 1" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Stav:" Width="150" VerticalAlignment="Top"/>
+                            <TextBlock x:Name="TxtMeasurementStatus"
+                                       Text="Připraveno."
+                                       VerticalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       MaxWidth="260"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Grid Grid.Column="2" Margin="10,10,10,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="200"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
+                    <Button x:Name="BtnToggleLeftPanel"
+                            Content="Skrýt panel"
+                            Click="BtnToggleLeftPanel_Click"
+                            Width="110"
+                            Padding="10,5"
+                            Margin="0,0,8,0"/>
+                    <Button x:Name="BtnOpenLanProgressPopup"
+                            Content="Sdílet na tel"
+                            Width="120"
+                            Padding="10,5"
+                            Margin="0,0,8,0"
+                            Click="BtnOpenLanProgressPopup_Click"/>
+                    <Button x:Name="BtnToggleTheme" 
+                            Content="Tmavý režim" 
+                            Click="BtnToggleTheme_Click"
+                            Width="140"
+                            Padding="10,5"
+                            Margin="0,0,8,0"/>
+                    <CheckBox x:Name="ChkWhiteBackground"
+                              Content="Bílé pozadí při ukládání"
+                              VerticalAlignment="Center"
+                              IsChecked="True"
+                              Checked="ChkWhiteBackground_Changed"
+                              Unchecked="ChkWhiteBackground_Changed"
+                              ToolTip="Uložit grafy vždy s bílým pozadím (i v tmavém režimu)"/>
+                </StackPanel>
+
+                <TextBlock Text="Výsledky měření" FontWeight="SemiBold" FontSize="18" Margin="0,0,0,10" Foreground="{DynamicResource TextForeground}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                        <TextBlock Text="Aktivita komunikace:" Margin="0,0,5,0" VerticalAlignment="Center" Foreground="{DynamicResource TextForeground}"/>
+                        <Border x:Name="EllipseCommunication" Style="{StaticResource IndicatorStyle}" Background="{StaticResource IndicatorRedBrush}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                        <TextBlock x:Name="TxtInputModeStatus" Text="Vstup: -" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource TextForeground}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Úhel otáčení:" Margin="15,0,5,0" VerticalAlignment="Center" Foreground="{DynamicResource TextForeground}"/>
+                        <TextBlock x:Name="TxtAngle" Text="0" VerticalAlignment="Center" FontWeight="Bold" Foreground="{DynamicResource TextForeground}"/>
+                        <CheckBox x:Name="CheckBtnRemoveNoise" Content="Nahrát šum" Margin="50,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <Grid Grid.Row="1" Margin="0,10,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <scottPlot:WpfPlot x:Name="spectrogramPlot"
+                                   Grid.Column="0"
+                                   Height="auto"
+                                   Margin="0,0,5,0"/>
+
+                <scottPlot:WpfPlot x:Name="FftPlot"
+                                   Grid.Column="1"
+                                   Height="auto"
+                                   Margin="5,0,0,0"/>
+            </Grid>
+
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <scottPlot:WpfPlot x:Name="PolarPlot"
+                           Grid.Row="1"
+                           Margin="5"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           ToolTip="Polární graf směrové charakteristiky"/>
+            </Grid>
+
+            <GroupBox Grid.Row="3" Header="Vyber frekvenci pro měření" Margin="0,10,0,10">
+                <WrapPanel x:Name="FrequencPanel">
+                    <CheckBox Content="125 Hz" Tag="125" Margin="5"/>
+                    <CheckBox Content="250 Hz" Tag="250" Margin="5"/>
+                    <CheckBox Content="500 Hz" Tag="500" Margin="5"/>
+                    <CheckBox Content="1000 Hz" Tag="1000" Margin="5"/>
+                    <CheckBox Content="2000 Hz" Tag="2000" Margin="5"/>
+                    <CheckBox Content="4000 Hz" Tag="4000" Margin="5"/>
+                    <CheckBox Content="8000 Hz" Tag="8000" Margin="5"/>
+                    <CheckBox Content="16000 Hz" Tag="16000" Margin="5"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Vlastní:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBox x:Name="CustomFrequencyBox"
+                              Width="180"
+                              Margin="0,0,5,0"
+                              TextChanged="CustomFrequencyBox_TextChanged"
+                              ToolTip="Zadejte jednu nebo více frekvencí oddělených mezerou (např. 315 630 1250)."/>
+                        <CheckBox x:Name="CustomFrequencyCheckBox" Content="Použít" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </WrapPanel>
+            </GroupBox>
+
+            <StackPanel Grid.Row="4" Orientation="Vertical" HorizontalAlignment="Stretch">
+                <GroupBox Header="Export a ovladani" Margin="0,0,0,10" Padding="5">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="260"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Místo uložení dat:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBox Grid.Column="1" x:Name="TxtSavePath" IsReadOnly="True" Margin="0,0,8,0" ToolTip="Základní složka, do které se ukládá session"/>
+                            <Button Grid.Column="2" x:Name="BtnChoosePath" Content="..." MinWidth="30" Width="30" Margin="0,0,10,0" Click="BtnChoosePath_Click"/>
+                            <TextBlock Grid.Column="3" Text="Konec názvu:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBox Grid.Column="4" x:Name="TxtSessionSuffix" MaxLength="80" HorizontalAlignment="Stretch" ToolTip="Volitelný text přidaný na konec názvu session"/>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5">
+                            <Button x:Name="BtnStartMeasurement"
+                                    Content="Spustit měření"
+                                    HorizontalAlignment="Left"
+                                    FontWeight="SemiBold"
+                                    IsEnabled="True"
+                                    Click="BtnStartMeasurement_Click"/>
+
+                            <TextBlock Text="Zpoždění (s):" Margin="10,0,5,0" VerticalAlignment="Center"/>
+                            <TextBox x:Name="TxtDelaySeconds" Width="50" Text="0" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,71 @@
+<Window x:Class="MeaSound.LanProgressPopupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sdileni prubehu na telefon"
+        Height="470"
+        Width="520"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <CheckBox x:Name="ChkEnableLanProgress"
+                  Grid.Row="0"
+                  Content="Povolit sdileni pres lokalni sit"
+                  Margin="0,0,0,8"
+                  Checked="ChkEnableLanProgress_Changed"
+                  Unchecked="ChkEnableLanProgress_Changed"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="Heslo:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <PasswordBox x:Name="TxtLanProgressPassword" Width="220" PasswordChanged="TxtLanProgressPassword_PasswordChanged"/>
+            <Button x:Name="BtnSaveLanPassword" Content="Ulozit heslo" Margin="8,0,0,0" Click="BtnSaveLanPassword_Click"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button x:Name="BtnToggleLanProgress" Content="Spustit sdileni" Width="130" Margin="0,0,8,0" Click="BtnToggleLanProgress_Click"/>
+            <Button x:Name="BtnCopyLanProgressUrl" Content="Kopirovat odkaz" Width="130" IsEnabled="False" Click="BtnCopyLanProgressUrl_Click"/>
+        </StackPanel>
+
+        <TextBox x:Name="TxtLanProgressUrl" Grid.Row="3" IsReadOnly="True" Margin="0,0,0,8"/>
+
+        <GroupBox Grid.Row="4" Header="Nahled toho, co vidite na webu" Margin="0,0,0,8" Padding="8">
+            <StackPanel>
+                <TextBlock Text="Stav:" FontWeight="SemiBold"/>
+                <TextBlock x:Name="TxtPreviewStatus" Margin="0,0,0,4"/>
+
+                <TextBlock Text="Cislo mereni:" FontWeight="SemiBold"/>
+                <TextBlock x:Name="TxtPreviewMeasurementIndex" Margin="0,0,0,4"/>
+
+                <TextBlock Text="Kroky:" FontWeight="SemiBold"/>
+                <TextBlock x:Name="TxtPreviewSteps" Margin="0,0,0,4"/>
+
+                <TextBlock Text="Aktualizace:" FontWeight="SemiBold"/>
+                <TextBlock x:Name="TxtPreviewUpdated" Margin="0,0,0,4"/>
+
+                <TextBlock Text="Rezim vstupu:" FontWeight="SemiBold"/>
+                <TextBlock x:Name="TxtPreviewInputMode" Margin="0,0,0,4"/>
+
+                <TextBlock Text="Signal / format:" FontWeight="SemiBold"/>
+                <TextBlock x:Name="TxtPreviewSignalAndFormat" Margin="0,0,0,4"/>
+
+                <TextBlock Text="Input / Output:" FontWeight="SemiBold"/>
+                <TextBlock x:Name="TxtPreviewDevices"/>
+            </StackPanel>
+        </GroupBox>
+
+        <TextBlock x:Name="TxtLanProgressHint"
+                   Grid.Row="5"
+                   Text="Neaktivni. Zapnete volbu a spustte sdileni."
+                   TextWrapping="Wrap"
+                   Foreground="Gray"
+                   FontSize="11"/>
+    </Grid>
+</Window>
